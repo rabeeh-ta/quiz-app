@@ -15,15 +15,15 @@ import { CheckCircle2, XCircle } from "lucide-react"
  * @param {string} [props.explanation] - Explanation for the correct answer
  */
 export default function MCQComponent({
-  question = "What is the capital of France?",
+  question = "The mcq question will be displayed here",
   options = [
-    { id: "paris", text: "Paris" },
-    { id: "london", text: "London" },
-    { id: "berlin", text: "Berlin" },
-    { id: "madrid", text: "Madrid" },
+    { id: "option1", text: "Option 1" },
+    { id: "option2", text: "Option 2" },
+    { id: "option3", text: "Option 3" },
+    { id: "option4", text: "Option 4" },
   ],
-  correctAnswer = "paris",
-  explanation = "Paris is the capital and most populous city of France.",
+  correctAnswer = "option1",
+  explanation = "The explanation for the correct answer will be displayed here",
   handleNext = () => {
     console.log("Next Question")
   },
