@@ -28,14 +28,14 @@ export function Navbar() {
                         <span>Home</span>
                     </Link>
                     <Link
-                        href="/explore"
+                        href="/subject"
                         className={cn(
                             "flex items-center p-2 text-sm font-medium transition-colors hover:text-primary",
-                            pathname === "/explore" ? "text-primary" : "text-muted-foreground"
+                            pathname === "/subject" ? "text-primary" : "text-muted-foreground"
                         )}
                     >
                         <Compass className="mr-2 h-4 w-4" />
-                        <span>Explore</span>
+                        <span>Subjects</span>
                     </Link>
                     <Link
                         href="/account"

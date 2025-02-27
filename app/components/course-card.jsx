@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import Image from "next/image"
 import Link from "next/link"
 
 export default function CourseCard({
@@ -8,10 +7,10 @@ export default function CourseCard({
     description = "Card Description",
     imageUrl = "/placeholder.svg?height=200&width=200",
     linkUrl = "#",
-    linkText = "Start Learning",
+    linkText = "Start Quiz",
 }) {
     return (
-        <Card className="w-full max-w-[280px] overflow-hidden gap-4">
+        <Card className="w-full overflow-hidden gap-4">
             <CardHeader className="px-4">
                 <h3 className="font-semibold text-lg line-clamp-1">{title}</h3>
             </CardHeader>
