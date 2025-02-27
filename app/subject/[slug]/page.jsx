@@ -1,49 +1,32 @@
 'use client';
-import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import app from '@/app/firebase';
 import QuestionText from './QuestionText';
+import useGetQuestion from '@/app/hooks/useFetchQuestion';
+import Spinner from '@/app/components/spinner';
 
 export default function SubjectPage() {
     // In App Router, use useParams instead of useRouter().query
     const params = useParams();
     const slug = params.slug;
-    const [questions, setQuestions] = useState({});
-    const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const db = getFirestore(app);
-                const questionsCollection = collection(db, slug);
-                const querySnapshot = await getDocs(questionsCollection);
+    // Use the custom hook to fetch questions
+    const { data: questions, isLoading, error } = useGetQuestion(slug);
 
-                const questionsData = {};
-                querySnapshot.forEach((doc) => {
-                    questionsData[doc.id] = doc.data();
-                });
-
-                setQuestions(questionsData);
-                console.log(questionsData);
-                setLoading(false);
-            } catch (error) {
-                console.error(`Error fetching ${slug} data:`, error);
-                setLoading(false);
-            }
-        };
-
-        if (slug) {
-            fetchData();
-        }
-    }, [slug]);
-
-    if (loading) {
+    if (isLoading) {
         return (
             <div className="container py-6">
                 <h1 className="text-3xl font-bold mb-6">Subject: {slug}</h1>
-                <div className="flex justify-center items-center h-40">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                <Spinner />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="container py-6">
+                <h1 className="text-3xl font-bold mb-6">Subject: {slug}</h1>
+                <div className="p-4 border border-red-300 bg-red-50 text-red-800 rounded-md">
+                    <p>Error loading questions: {error.message}</p>
                 </div>
             </div>
         );

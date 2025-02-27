@@ -26,8 +26,9 @@ export default function MCQComponent({
   explanation = "Paris is the capital and most populous city of France.",
   handleNext = () => {
     console.log("Next Question")
-  }
+  },
 }) {
+
   const [selectedOption, setSelectedOption] = useState("")
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
