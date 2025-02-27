@@ -34,13 +34,15 @@ const loadBacteriologyData = async () => {
         const entries = Object.entries(bacteriologyData);
 
         for (const [id, question] of entries) {
-            // Create a document with the same ID as in the JSON
-            await setDoc(doc(questionsCollection, id), {
-                id: id,
+            // Convert the string ID to a number without decimal
+            const numericId = parseInt(id, 10);
+            // Create a document with the numeric ID
+            await setDoc(doc(questionsCollection, numericId.toString()), {
+                id: numericId,
                 question: question,
                 createdAt: new Date()
             });
-            console.log(`Added question ${id}`);
+            console.log(`Added question ${numericId}`);
         }
 
         console.log(`Successfully loaded ${entries.length} bacteriology questions to Firestore`);

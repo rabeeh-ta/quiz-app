@@ -66,8 +66,6 @@ export default function useFetchLlm() {
             if (!valid) {
                 throw new Error(`Invalid JSON schema: ${ajv.errorsText(validate.errors)}`);
             }
-
-            console.log(responseJSON);
             setData(responseJSON);
         } catch (error) {
             console.error("Error generating MCQ:", error);

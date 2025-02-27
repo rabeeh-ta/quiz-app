@@ -60,7 +60,7 @@ function QuizPage() {
         }
     }, [mcq]);
 
-    console.log("question", question);
+    // console.log("question", question);
 
     useEffect(() => {
         if (question && currentQuestionNo !== null) {
