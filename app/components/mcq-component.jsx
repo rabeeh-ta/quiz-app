@@ -1,10 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, XCircle } from "lucide-react"
+import useAddUserCompletion from "@/app/hooks/useAddUserCompletion"
+import { useUser } from "@/app/context/UserContext"
 
 /**
  * Multiple Choice Question Component
@@ -15,6 +17,8 @@ import { CheckCircle2, XCircle } from "lucide-react"
  * @param {string} [props.explanation] - Explanation for the correct answer
  */
 export default function MCQComponent({
+  userId = "",
+  questionId = "",
   question = "The mcq question will be displayed here",
   options = [
     { id: "option1", text: "Option 1" },
@@ -24,6 +28,7 @@ export default function MCQComponent({
   ],
   correctAnswer = "option1",
   explanation = "The explanation for the correct answer will be displayed here",
+  subject = "",
   handleNext = () => {
     console.log("Next Question")
   },
@@ -32,11 +37,17 @@ export default function MCQComponent({
   const [selectedOption, setSelectedOption] = useState("")
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
+  const { user } = useUser()
+
+  const { addCompletion } = useAddUserCompletion()
 
   const handleSubmit = () => {
     if (!selectedOption) return
 
     const correct = selectedOption === correctAnswer
+    if (user !== null) {
+      addCompletion(user.id, questionId, subject, correct)
+    }
     setIsCorrect(correct)
     setIsSubmitted(true)
   }

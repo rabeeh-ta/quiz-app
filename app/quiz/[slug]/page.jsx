@@ -48,11 +48,13 @@ function QuizPage() {
     useEffect(() => {
         if (mcq) {
             setQuestion({
+                questionId: Object.keys(questions)[currentQuestionNo],
                 question: Object.values(questions)[currentQuestionNo].question,
                 options: mcq.options.map(option => ({
                     id: option,
                     text: option,
                 })),
+                subject: slug,
                 correctAnswer: mcq.options[mcq.answer_key],
                 explanation: mcq.explanation,
                 key: Object.keys(questions)[currentQuestionNo],

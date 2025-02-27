@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import BottomNavigation from "./components/BottomNavigation";
 import ThemeProviderClient from "./context/ThemeProviderClient";
+import { UserProvider } from "./context/UserContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,11 +24,14 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <ThemeProviderClient>
-          <main className="mt-4 mx-4" style={{ paddingBottom: '70px' }}>
-            {children}
-          </main>
-          <BottomNavigation />
+          <UserProvider>
+            <main className="mt-4 mx-4" style={{ paddingBottom: '70px' }}>
+              {children}
+            </main>
+            <BottomNavigation />
+          </UserProvider>
         </ThemeProviderClient>
+
       </body>
     </html>
   );
