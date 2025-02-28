@@ -27,6 +27,7 @@ function QuizPage() {
 
     const [currentQuestionNo, setCurrentQuestion] = useState(null);
 
+    //? get the already answered questions
     const alreadyAnsweredQuestions = useMemo(() => {
         if (userCompletions) {
             return userCompletions.filter(completion => completion.answered === true).map(completion => completion.questionId);
@@ -34,6 +35,7 @@ function QuizPage() {
         return [];
     }, [userCompletions, user]);
 
+    //? utility function to find the next unanswered question
     const findNextUnansweredQuestion = useCallback((currentNo, totalQs) => {
         // Base case: if we've reached the end of questions
         if (currentNo >= totalQs - 1) {
@@ -51,8 +53,7 @@ function QuizPage() {
         }
     }, [questions, alreadyAnsweredQuestions]);
 
-    console.log("alreadyAnsweredQuestions", alreadyAnsweredQuestions)
-
+    // get the total number of questions
     const totalQuestions = useMemo(() => {
         if (questions && Object.keys(questions).length > 0) {
             if (currentQuestionNo === null) {  // Only set if not already set
@@ -66,6 +67,7 @@ function QuizPage() {
         return 0;
     }, [questions, currentQuestionNo, questionsLoading, findNextUnansweredQuestion]);
 
+    // handle the next question
     const handleNextQuestion = () => {
         if (currentQuestionNo < totalQuestions - 1) {
             const nextQuestionNo = findNextUnansweredQuestion(currentQuestionNo, totalQuestions);
