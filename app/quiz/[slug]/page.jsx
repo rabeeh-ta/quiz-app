@@ -6,9 +6,12 @@ import useGetQuestion from '@/app/hooks/useFetchQuestion';
 import Spinner from '@/app/components/spinner';
 import useFetchLlm from '@/app/hooks/useFetchLlm';
 import useUpdateQuestion from '@/app/hooks/useUpdateQuestion';
+import { useUser } from '@/app/context/UserContext';
+import useFetchUserCompletions from '@/app/hooks/useFetchUserCompletions';
 
 function QuizPage() {
     const { slug } = useParams();
+    const { user } = useUser();
     const { data: questions, isLoading: questionsLoading, error: questionsError } = useGetQuestion(slug);
     const [question, setQuestion] = useState({
         question: "",
@@ -16,24 +19,57 @@ function QuizPage() {
         correctAnswer: "",
         explanation: "",
     });
+
+    //data fetching
     const { data: mcq, isLoading: mcqLoading, error: mcqError, generateMCQ } = useFetchLlm();
     const { updateQuestion, isLoading: updateQuestionLoading, error: updateQuestionError } = useUpdateQuestion();
+    const { data: userCompletions, isLoading: userCompletionsLoading, error: userCompletionsError } = useFetchUserCompletions(user?.id, true);
 
     const [currentQuestionNo, setCurrentQuestion] = useState(null);
+
+    const alreadyAnsweredQuestions = useMemo(() => {
+        if (userCompletions) {
+            return userCompletions.filter(completion => completion.answered === true).map(completion => completion.questionId);
+        }
+        return [];
+    }, [userCompletions, user]);
+
+    const findNextUnansweredQuestion = useCallback((currentNo, totalQs) => {
+        // Base case: if we've reached the end of questions
+        if (currentNo >= totalQs - 1) {
+            return totalQs - 1; // Return the last question index
+        }
+
+        // Check if the next question has already been answered
+        const nextQuestionId = parseInt(Object.keys(questions)[currentNo + 1], 10);
+        if (alreadyAnsweredQuestions.includes(nextQuestionId)) {
+            // If already answered, recursively check the next one
+            return findNextUnansweredQuestion(currentNo + 1, totalQs);
+        } else {
+            // Found an unanswered question
+            return currentNo + 1;
+        }
+    }, [questions, alreadyAnsweredQuestions]);
+
+    console.log("alreadyAnsweredQuestions", alreadyAnsweredQuestions)
 
     const totalQuestions = useMemo(() => {
         if (questions && Object.keys(questions).length > 0) {
             if (currentQuestionNo === null) {  // Only set if not already set
-                setCurrentQuestion(0);
+                // Find first unanswered question starting from index -1
+                // or use 0 if you want to start from the first question
+                const firstUnansweredIndex = findNextUnansweredQuestion(-1, Object.keys(questions).length);
+                setCurrentQuestion(firstUnansweredIndex);
             }
             return Object.keys(questions).length;
         }
         return 0;
-    }, [questions, currentQuestionNo, questionsLoading]);
+    }, [questions, currentQuestionNo, questionsLoading, findNextUnansweredQuestion]);
 
     const handleNextQuestion = () => {
         if (currentQuestionNo < totalQuestions - 1) {
-            setCurrentQuestion(currentQuestionNo + 1);
+            const nextQuestionNo = findNextUnansweredQuestion(currentQuestionNo, totalQuestions);
+            setCurrentQuestion(nextQuestionNo);
         }
     }
 
@@ -72,6 +108,10 @@ function QuizPage() {
             });
         }
     }, [question]);
+
+    useEffect(() => {
+        console.log("currentQuestionNo", currentQuestionNo);
+    }, [currentQuestionNo]);
 
 
     if (questionsLoading) {

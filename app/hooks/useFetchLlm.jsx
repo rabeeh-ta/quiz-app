@@ -28,7 +28,7 @@ export default function useFetchLlm() {
                 prompt: prompt,
             });
 
-            console.log('ai response:', text);
+            // console.log('ai response:', text);
 
             const cleanedText = text.trim().replace(/```json\n?|\n?```/g, '');
 

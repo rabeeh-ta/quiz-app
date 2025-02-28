@@ -15,7 +15,7 @@ export default function useAddUserCompletion() {
     /**
      * Add a user completion record to Firestore
      * @param {string} userId - The ID of the user
-     * @param {string} questionId - The ID of the question
+     * @param {number} questionId - The ID of the question
      * @param {string} subject - The subject of the question
      * @param {boolean} answered - Whether the user answered correctly
      * @returns {Promise<boolean>} - True if successful, false otherwise
@@ -36,7 +36,7 @@ export default function useAddUserCompletion() {
             await addDoc(completionsCollection, {
                 attempted_on: new Date(),
                 userId,
-                questionId,
+                questionId: Number(questionId), // Convert questionId to number
                 subject,
                 answered
             });
