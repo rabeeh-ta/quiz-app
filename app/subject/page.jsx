@@ -12,7 +12,7 @@ export default function ExplorePage() {
                 </p>
 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    <CourseCard title="Bacteriology" description="Learn about bacteria and their properties." linkUrl="/subject/bacteriology" linkText="See Questions" />
+                    <CourseCard title="Bacteriology" description="Bacteriology is the study of bacteria, their classification, structure, functions, and role in health, disease, and industry." linkUrl="/subject/bacteriology" linkText="See Questions" />
                 </div>
             </div>
         </AuthMiddleware>

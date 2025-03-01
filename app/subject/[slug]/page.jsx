@@ -1,9 +1,9 @@
 'use client';
 import { useParams } from 'next/navigation';
-import QuestionText from './QuestionText';
 import useGetQuestion from '@/app/hooks/useFetchQuestion';
 import Spinner from '@/app/components/spinner';
 import AuthMiddleware from '@/app/utils/authMiddleware';
+import QuestionCard from '@/app/components/question-card';
 
 export default function SubjectPage() {
     // In App Router, use useParams instead of useRouter().query
@@ -12,6 +12,7 @@ export default function SubjectPage() {
 
     // Use the custom hook to fetch questions
     const { data: questions, isLoading, error } = useGetQuestion(slug);
+
 
     // Content to be rendered conditionally
     const content = () => {
@@ -42,7 +43,7 @@ export default function SubjectPage() {
                 {Object.keys(questions).length > 0 ? (
                     <div className="space-y-4">
                         {Object.entries(questions).map(([id, data]) =>
-                            (<QuestionText key={id} id={id} question={data.question} />)
+                            (<QuestionCard question={data.question} questionId={id} answer={data.answer} description={data.description} />)
                         )}
                     </div>
                 ) : (
