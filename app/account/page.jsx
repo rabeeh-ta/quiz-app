@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import BottomNavigation from '@/app/components/BottomNavigation';
-import { auth, signInWithGoogle, signOutUser } from '@/app/firebase';
-import SignInGoogleCard from '@/app/account/SignInGoogleCard';
+import { auth, signOutUser } from '@/app/firebase';
 import UserProfileCard from '@/app/account/UserProfileCard';
 import SignOutCard from '@/app/account/SignOutCard';
 import ThemeToggle from '@/app/components/theme-toggle';
+import AuthMiddleware from '@/app/utils/authMiddleware';
 
 export default function AccountPage() {
     const [user, setUser] = useState(null);
@@ -21,14 +20,6 @@ export default function AccountPage() {
         return () => unsubscribe();
     }, []);
 
-    const handleGoogleSignIn = async () => {
-        try {
-            await signInWithGoogle();
-        } catch (error) {
-            console.error("Google sign in failed:", error);
-        }
-    };
-
     const handleSignOut = async () => {
         try {
             await signOutUser();
@@ -36,7 +27,6 @@ export default function AccountPage() {
             console.error("Sign out failed:", error);
         }
     };
-
 
     if (loading) {
         return (
@@ -47,23 +37,20 @@ export default function AccountPage() {
     }
 
     return (
-        <>
+        <AuthMiddleware>
             <div className="container space-y-4">
                 <h1 className="text-3xl font-bold ms-2 mb-6">Account</h1>
 
+                <UserProfileCard user={user} />
 
-
-                {!user && <SignInGoogleCard handleGoogleSignIn={handleGoogleSignIn} />}
-
-                {user && <UserProfileCard user={user} />}
                 {/* Theme Toggle Card */}
                 <div className="p-4 border rounded-lg bg-card text-card-foreground shadow-sm">
                     <h2 className="text-xl font-semibold mb-3">Appearance</h2>
                     <ThemeToggle />
                 </div>
-                {user && <SignOutCard handleSignOut={handleSignOut} />}
+
+                <SignOutCard handleSignOut={handleSignOut} />
             </div>
-            <BottomNavigation />
-        </>
+        </AuthMiddleware>
     );
 } 

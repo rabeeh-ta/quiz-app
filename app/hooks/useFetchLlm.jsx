@@ -17,7 +17,9 @@ export default function useFetchLlm() {
         setError(null);
 
         try {
-            const prompt = `Generate 4 multiple-choice options and the correct answer key (0-3) for the question: "${question}". Return the response as a JSON object with "options" (an array of strings) and "answer_key" (a number) and "explanation" (a small explanation for the correct answer) keys.`;
+            const prompt = `Generate 4 multiple-choice options and the correct answer key (0-3) for the question: "${question}". Return the response as a JSON object with "options" (an array of strings) and "answer_key" (a number) and "explanation" (a small explanation for the correct answer) keys.
+            
+            Don't use any use any ordering for the options. like "A: option1, B: option2, C: option3, D: option4" or "1: option1, 2: option2, 3: option3, 4: option4" or anything like that. Just return the options in a random order.`;
 
             const googleAI = createGoogleGenerativeAI({
                 apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY

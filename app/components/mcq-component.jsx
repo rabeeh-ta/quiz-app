@@ -1,13 +1,13 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, XCircle } from "lucide-react"
 import useAddUserCompletion from "@/app/hooks/useAddUserCompletion"
 import { useUser } from "@/app/context/UserContext"
-
+import Spinner from "./spinner"
 /**
  * Multiple Choice Question Component
  * @param {Object} props
@@ -17,7 +17,6 @@ import { useUser } from "@/app/context/UserContext"
  * @param {string} [props.explanation] - Explanation for the correct answer
  */
 export default function MCQComponent({
-  userId = "",
   questionId = "",
   question = "The mcq question will be displayed here",
   options = [
@@ -32,6 +31,8 @@ export default function MCQComponent({
   handleNext = () => {
     console.log("Next Question")
   },
+  questionKey = "",
+  isLoading = false
 }) {
 
   const [selectedOption, setSelectedOption] = useState("")
@@ -56,6 +57,10 @@ export default function MCQComponent({
     setSelectedOption("")
     setIsSubmitted(false)
     setIsCorrect(false)
+  }
+
+  if (isLoading) {
+    return <Spinner />
   }
 
   return (

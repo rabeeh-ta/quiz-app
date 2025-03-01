@@ -1,9 +1,10 @@
-import BottomNavigation from '@/app/components/BottomNavigation';
+'use client';
 import CourseCard from '../components/course-card';
+import AuthMiddleware from '@/app/utils/authMiddleware';
 
 export default function ExplorePage() {
     return (
-        <>
+        <AuthMiddleware>
             <div className="container">
                 <h1 className="text-3xl font-bold mb-6">Subjects</h1>
                 <p className="text-muted-foreground mb-6">
@@ -14,7 +15,6 @@ export default function ExplorePage() {
                     <CourseCard title="Bacteriology" description="Learn about bacteria and their properties." linkUrl="/subject/bacteriology" linkText="See Questions" />
                 </div>
             </div>
-            <BottomNavigation />
-        </>
+        </AuthMiddleware>
     );
 } 

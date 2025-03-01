@@ -8,6 +8,7 @@ import useFetchLlm from '@/app/hooks/useFetchLlm';
 import useUpdateQuestion from '@/app/hooks/useUpdateQuestion';
 import { useUser } from '@/app/context/UserContext';
 import useFetchUserCompletions from '@/app/hooks/useFetchUserCompletions';
+import AuthMiddleware from '@/app/utils/authMiddleware';
 
 function QuizPage() {
     const { slug } = useParams();
@@ -95,7 +96,6 @@ function QuizPage() {
                 subject: slug,
                 correctAnswer: mcq.options[mcq.answer_key],
                 explanation: mcq.explanation,
-                key: Object.keys(questions)[currentQuestionNo],
             });
         }
     }, [mcq]);
@@ -125,9 +125,11 @@ function QuizPage() {
     }
 
     return (
-        <div className="flex items-center justify-center h-screen-90">
-            {mcqLoading ? <Spinner /> : <MCQComponent {...question} handleNext={handleNextQuestion} />}
-        </div>
+        <AuthMiddleware>
+            <div className="flex items-center justify-center h-screen-90">
+                {mcqLoading ? <Spinner /> : <MCQComponent questionKey={currentQuestionNo} {...question} handleNext={handleNextQuestion} />}
+            </div>
+        </AuthMiddleware>
     )
 }
 
