@@ -10,27 +10,25 @@ export default function CompactCourseCard({
     onPractice = () => { },
 }) {
     return (
-        <Card className="w-full overflow-hidden shadow-sm py-0 bg-white dark:bg-gray-950 dark:border-gray-800">
-            <CardContent className="p-2 flex items-center justify-between">
-                <div className="flex items-center gap-3 flex-1">
-                    <div className="relative h-12 w-12 overflow-hidden rounded-md flex-shrink-0">
-                        <Image
-                            src={imageUrl}
-                            alt={title}
-                            fill
-                            className="object-cover"
-                            priority
-                        />
-                    </div>
-
-                    <h3 className="text-sm font-medium line-clamp-1 flex-1">{title}</h3>
+        <Card className="w-full overflow-hidden shadow-md py-0 bg-white dark:bg-gray-950 dark:border-gray-800">
+            <CardContent className="p-4 flex flex-col sm:flex-row items-center gap-4">
+                <div className="relative h-16 w-16 overflow-hidden rounded-md flex-shrink-0">
+                    <Image
+                        src={imageUrl}
+                        alt={title}
+                        fill
+                        className="object-cover"
+                        priority
+                    />
                 </div>
+
+                <h2 className="text-base font-medium line-clamp-2 flex-1 text-center sm:text-left">{title}</h2>
 
                 <Button
                     variant="default"
-                    size="sm"
+                    size="default"
                     onClick={onPractice}
-                    className="ml-2 flex-shrink-0"
+                    className="px-6 py-2 font-semibold flex-shrink-0 w-full sm:w-auto"
                 >
                     Practice
                 </Button>
