@@ -1,8 +1,10 @@
 'use client';
 import CourseCard from '../components/course-card';
 import AuthMiddleware from '@/app/utils/authMiddleware';
+import { useRouter } from 'next/navigation';
 
 export default function ExplorePage() {
+    const router = useRouter();
     return (
         <AuthMiddleware>
             <div className="container">
@@ -12,7 +14,13 @@ export default function ExplorePage() {
                 </p>
 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    <CourseCard title="Bacteriology" description="Bacteriology is the study of bacteria, their classification, structure, functions, and role in health, disease, and industry." linkUrl="/subject/bacteriology" linkText="See Questions" />
+                    <CourseCard title="Bacteriology" description="Bacteriology is the study of bacteria, their classification, structure, functions, and role in health, disease, and industry." primaryActionText="See Questions" secondaryActionText="Practice Quiz" imageUrl="/course-images/bacteriology.jpeg" onPrimaryAction={() => {
+                        router.push('/subject/bacteriology');
+                    }}
+                        onSecondaryAction={() => {
+                            router.push('/quiz/bacteriology');
+                        }}
+                    />
                 </div>
             </div>
         </AuthMiddleware>

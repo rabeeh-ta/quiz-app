@@ -15,7 +15,7 @@ export default function QuestionCard({
   const accuracy = attempts > 0 ? Math.round((correctAttempts / attempts) * 100) : 0
 
   return (
-    <Card className="w-full max-w-lg" key={questionId}>
+    <Card className="w-full max-w-lg py-4 gap-4" key={questionId}>
       <CardHeader>
         <CardTitle className="text-xl font-bold">{question}</CardTitle>
       </CardHeader>

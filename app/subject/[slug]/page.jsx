@@ -41,9 +41,9 @@ export default function SubjectPage() {
                 <h1 className="text-3xl font-bold mb-6">Subject: {slug}</h1>
 
                 {Object.keys(questions).length > 0 ? (
-                    <div className="space-y-4">
+                    <div className="space-y-8">
                         {Object.entries(questions).map(([id, data]) =>
-                            (<QuestionCard question={data.question} questionId={id} answer={data.answer} description={data.description} />)
+                            (<QuestionCard question={data.question} questionId={id} answer={data.answer} description={data.explanation} />)
                         )}
                     </div>
                 ) : (
