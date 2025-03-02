@@ -21,16 +21,21 @@ export default function useUpdateQuestion() {
             return;
         }
 
+        // Ensure collectionName and documentId are strings
+        const collection = String(collectionName);
+        const docId = String(documentId);
+
         setIsLoading(true);
         setError(null);
 
         try {
             const db = getFirestore(app);
-            const questionRef = doc(db, collectionName, documentId);
+            const questionRef = doc(db, collection, docId);
 
             await updateDoc(questionRef, {
-                description: newFields.description,
+                explanation: newFields.explanation,
                 answer: newFields.answer,
+                options: newFields.options,
                 updatedAt: new Date()  // Optional: add a timestamp for when the update occurred
             });
 

@@ -12,27 +12,20 @@ import Spinner from "./spinner"
  * Multiple Choice Question Component
  * @param {Object} props
  * @param {string} props.question - The question text
- * @param {Array<{id: string, text: string}>} props.options - Array of options
- * @param {string} props.correctAnswer - ID of the correct answer
+ * @param {Array<{id: string|number, text: string}>} props.options - Array of options
+ * @param {string} props.correctAnswer - Text of the correct answer
  * @param {string} [props.explanation] - Explanation for the correct answer
  */
 export default function MCQComponent({
   questionId = "",
-  question = "The mcq question will be displayed here",
-  options = [
-    { id: "option1", text: "Option 1" },
-    { id: "option2", text: "Option 2" },
-    { id: "option3", text: "Option 3" },
-    { id: "option4", text: "Option 4" },
-  ],
-  correctAnswer = "option1",
-  explanation = "The explanation for the correct answer will be displayed here",
+  question = "",
+  options = [],
+  correctAnswer = "",
+  explanation = "",
   subject = "",
-  handleNext = () => {
-    console.log("Next Question")
-  },
-  questionKey = "",
-  isLoading = false
+  handleNext = () => { },
+  isLoading = false,
+  onQuestionResult = () => { }
 }) {
 
   const [selectedOption, setSelectedOption] = useState("")
@@ -42,15 +35,27 @@ export default function MCQComponent({
 
   const { addCompletion } = useAddUserCompletion()
 
+  // Find the correct option id based on the correctAnswer text
+  const getCorrectOptionId = () => {
+    const correctOption = options.find(option => option.text === correctAnswer)
+    return correctOption ? correctOption.id : null
+  }
+
   const handleSubmit = () => {
     if (!selectedOption) return
 
-    const correct = selectedOption === correctAnswer
+    // Compare selectedOption with the correct option id
+    const correctOptionId = getCorrectOptionId()
+    const correct = selectedOption === correctOptionId?.toString()
+
     if (user !== null) {
       addCompletion(user.id, questionId, subject, correct)
     }
     setIsCorrect(correct)
     setIsSubmitted(true)
+
+    // Call the onQuestionResult callback with the result
+    onQuestionResult(correct)
   }
 
   const handleReset = () => {
@@ -62,6 +67,9 @@ export default function MCQComponent({
   if (isLoading) {
     return <Spinner />
   }
+
+  // Get the correct option id for comparison in the UI
+  const correctOptionId = getCorrectOptionId()
 
   return (
     <div
@@ -75,20 +83,20 @@ export default function MCQComponent({
         {options.map((option) => (
           <div
             key={option.id}
-            className={`flex items-center rounded-lg border p-4 transition-colors ${isSubmitted && option.id === correctAnswer
+            className={`flex items-center rounded-lg border p-4 transition-colors ${isSubmitted && option.id.toString() === correctOptionId?.toString()
               ? "border-green-500 bg-green-50 dark:bg-green-950/20"
-              : isSubmitted && option.id === selectedOption && option.id !== correctAnswer
+              : isSubmitted && option.id.toString() === selectedOption && option.id.toString() !== correctOptionId?.toString()
                 ? "border-red-500 bg-red-50 dark:bg-red-950/20"
-                : selectedOption === option.id
+                : selectedOption === option.id.toString()
                   ? "border-primary bg-primary/5"
                   : "border-gray-200 dark:border-gray-800"
               }`}>
-            <RadioGroupItem value={option.id} id={option.id} className="mr-3" />
-            <Label htmlFor={option.id} className="w-full cursor-pointer font-medium">
+            <RadioGroupItem value={option.id.toString()} id={option.id.toString()} className="mr-3" />
+            <Label htmlFor={option.id.toString()} className="w-full cursor-pointer font-medium">
               {option.text}
             </Label>
-            {isSubmitted && option.id === correctAnswer && <CheckCircle2 className="ml-auto text-green-500 h-5 w-5" />}
-            {isSubmitted && option.id === selectedOption && option.id !== correctAnswer && (
+            {isSubmitted && option.id.toString() === correctOptionId?.toString() && <CheckCircle2 className="ml-auto text-green-500 h-5 w-5" />}
+            {isSubmitted && option.id.toString() === selectedOption && option.id.toString() !== correctOptionId?.toString() && (
               <XCircle className="ml-auto text-red-500 h-5 w-5" />
             )}
           </div>
@@ -108,9 +116,9 @@ export default function MCQComponent({
             <p className="mt-2 text-sm">{explanation}</p>
           </div>
           <div className="flex gap-2">
-            <Button onClick={handleReset} className="w-full">
+            {/* <Button onClick={handleReset} className="w-full">
               Try Again
-            </Button>
+            </Button> */}
             {isSubmitted && <Button onClick={handleNext} disabled={!selectedOption} className="w-full">
               Next Question
             </Button>}

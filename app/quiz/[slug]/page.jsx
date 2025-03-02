@@ -9,125 +9,139 @@ import useUpdateQuestion from '@/app/hooks/useUpdateQuestion';
 import { useUser } from '@/app/context/UserContext';
 import useFetchUserCompletions from '@/app/hooks/useFetchUserCompletions';
 import AuthMiddleware from '@/app/utils/authMiddleware';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import QuizCompletionCard from '@/app/components/quiz-completion-card';
+
+function popFromStack(stack, setStack) {
+    const poppedValue = stack.pop();
+    setStack(stack);
+    return poppedValue;
+}
 
 function QuizPage() {
     const { slug } = useParams();
     const { user } = useUser();
-    const { data: questions, isLoading: questionsLoading, error: questionsError } = useGetQuestion(slug);
-    const [question, setQuestion] = useState({
-        question: "",
-        options: [],
-        correctAnswer: "",
-        explanation: "",
-    });
+    const router = useRouter();
+    const [currentQuestion, setCurrentQuestion] = useState(null);
+    const [currentQuestionScreen, setCurrentQuestionScreen] = useState(null);
+    const [currentQuestionScreenLoading, setCurrentQuestionScreenLoading] = useState(true);
+    const [quizOver, setQuizOver] = useState(false);
+    const [questionsStack, setQuestionsStack] = useState([]);
+    const [totalQuestionsAttempted, setTotalQuestionsAttempted] = useState(0);
+    const [correctAnswers, setCorrectAnswers] = useState(0);
 
     //data fetching
-    const { data: mcq, isLoading: mcqLoading, error: mcqError, generateMCQ } = useFetchLlm();
+    const { data: allQuestionData, isLoading: allQuestionDataLoading, error: allQuestionDataError } = useGetQuestion(slug);
+    const { generateMCQ } = useFetchLlm();
     const { updateQuestion, isLoading: updateQuestionLoading, error: updateQuestionError } = useUpdateQuestion();
     const { data: userCompletions, isLoading: userCompletionsLoading, error: userCompletionsError } = useFetchUserCompletions(user?.id, true);
 
-    const [currentQuestionNo, setCurrentQuestion] = useState(null);
+    // Function to end the quiz
+    const endQuiz = useCallback(() => {
+        setCurrentQuestion(null);
+        setCurrentQuestionScreen(null);
+        setQuizOver(true);
+    }, []);
 
-    //? get the already answered questions
-    const alreadyAnsweredQuestions = useMemo(() => {
-        if (userCompletions) {
-            return userCompletions.filter(completion => completion.answered === true).map(completion => completion.questionId);
+    // Function to track question results
+    const handleQuestionResult = useCallback((isCorrect) => {
+        setTotalQuestionsAttempted(prev => prev + 1);
+        if (isCorrect) {
+            setCorrectAnswers(prev => prev + 1);
         }
-        return [];
-    }, [userCompletions, user]);
+    }, []);
 
-    //? utility function to find the next unanswered question
-    const findNextUnansweredQuestion = useCallback((currentNo, totalQs) => {
-        // Base case: if we've reached the end of questions
-        if (currentNo >= totalQs - 1) {
-            return totalQs - 1; // Return the last question index
+    // data fetch and setting.
+    useEffect(() => {
+        if (allQuestionData) {
+            const questionsArray = Object.values(allQuestionData);
+            const shuffledQuestions = questionsArray.sort(() => Math.random() - 0.5);
+            const firstPopped = shuffledQuestions.pop();
+            setQuestionsStack(shuffledQuestions);
+            setCurrentQuestion(firstPopped);
         }
+    }, [allQuestionData]);
 
-        // Check if the next question has already been answered
-        const nextQuestionId = parseInt(Object.keys(questions)[currentNo + 1], 10);
-        if (alreadyAnsweredQuestions.includes(nextQuestionId)) {
-            // If already answered, recursively check the next one
-            return findNextUnansweredQuestion(currentNo + 1, totalQs);
-        } else {
-            // Found an unanswered question
-            return currentNo + 1;
+    function handleNextQuestion() {
+        if (questionsStack.length === 0) {
+            setQuizOver(true);
+            return;
         }
-    }, [questions, alreadyAnsweredQuestions]);
-
-    // get the total number of questions
-    const totalQuestions = useMemo(() => {
-        if (questions && Object.keys(questions).length > 0) {
-            if (currentQuestionNo === null) {  // Only set if not already set
-                // Find first unanswered question starting from index -1
-                // or use 0 if you want to start from the first question
-                const firstUnansweredIndex = findNextUnansweredQuestion(-1, Object.keys(questions).length);
-                setCurrentQuestion(firstUnansweredIndex);
-            }
-            return Object.keys(questions).length;
-        }
-        return 0;
-    }, [questions, currentQuestionNo, questionsLoading, findNextUnansweredQuestion]);
-
-    // handle the next question
-    const handleNextQuestion = () => {
-        if (currentQuestionNo < totalQuestions - 1) {
-            const nextQuestionNo = findNextUnansweredQuestion(currentQuestionNo, totalQuestions);
-            setCurrentQuestion(nextQuestionNo);
-        }
+        setCurrentQuestionScreenLoading(true);
+        const questionPopped = popFromStack(questionsStack, setQuestionsStack);
+        setCurrentQuestion(questionPopped);
     }
 
-    // call the LLM to generate the MCQ
     useEffect(() => {
-        if (currentQuestionNo < totalQuestions - 1 && !questionsLoading && currentQuestionNo >= 0) {
-            generateMCQ(Object.values(questions)[currentQuestionNo].question);
+
+        if (currentQuestion) {
+            if (currentQuestion?.options?.length === 4) {
+                setCurrentQuestionScreen({ ...currentQuestion, options: currentQuestion.options.sort(() => Math.random() - 0.5) });
+                setCurrentQuestionScreenLoading(false);
+            } else {
+                // generate mcq
+                generateMCQ(currentQuestion.question).then(mcq => {
+                    setCurrentQuestionScreen({ answer: mcq.options[mcq.answer_key], options: mcq.options, explanation: mcq.explanation, question: currentQuestion.question, id: currentQuestion.id });
+                    updateQuestion(slug, currentQuestion.id, { options: mcq.options, answer: mcq.options[mcq.answer_key], explanation: mcq.explanation });
+                    setCurrentQuestionScreenLoading(false);
+                }).catch(error => {
+                    alert("Error generating MCQ");
+                    router.push(`/`);
+                    setCurrentQuestionScreenLoading(true);
+                });
+            }
         }
-    }, [currentQuestionNo, totalQuestions, questionsLoading]);
+    }, [currentQuestion, quizOver]);
 
-    // update the current question object with the data from the LLM
-    useEffect(() => {
-        if (mcq) {
-            setQuestion({
-                questionId: Object.keys(questions)[currentQuestionNo],
-                question: Object.values(questions)[currentQuestionNo].question,
-                options: mcq.options.map(option => ({
-                    id: option,
-                    text: option,
-                })),
-                subject: slug,
-                correctAnswer: mcq.options[mcq.answer_key],
-                explanation: mcq.explanation,
-            });
-        }
-    }, [mcq]);
-
-    // console.log("question", question);
-
-    useEffect(() => {
-        if (question && currentQuestionNo !== null) {
-            updateQuestion(slug, question.key, {
-                description: question.explanation,
-                answer: question.correctAnswer,
-            });
-        }
-    }, [question]);
-
-    useEffect(() => {
-        console.log("currentQuestionNo", currentQuestionNo);
-    }, [currentQuestionNo]);
-
-
-    if (questionsLoading) {
+    if (allQuestionDataLoading) {
         return <Spinner />;
     }
 
-    if (questionsError) {
-        return <div>Error: {questionsError.message}</div>;
+    if (allQuestionDataError) {
+        return <div>Error: {allQuestionDataError.message}</div>;
     }
 
     return (
         <AuthMiddleware>
-            <div className="flex items-center justify-center h-screen-90">
-                {mcqLoading ? <Spinner /> : <MCQComponent questionKey={currentQuestionNo} {...question} handleNext={handleNextQuestion} />}
+            <div className="flex flex-col items-center justify-center h-screen-90">
+                {/* End Quiz Button */}
+                {!quizOver && !currentQuestionScreenLoading && (
+                    <div className="w-full flex justify-end px-4 mb-4">
+                        <Button
+                            variant="destructive"
+                            onClick={endQuiz}
+                            className="mb-4"
+                        >
+                            End Quiz
+                        </Button>
+                    </div>
+                )}
+
+                {/* Loading Spinner */}
+                {currentQuestionScreenLoading && <Spinner />}
+
+                {/* MCQ Component */}
+                {!currentQuestionScreenLoading && !quizOver
+                    && <MCQComponent
+                        options={currentQuestionScreen.options.map((option, index) => ({ id: index, text: option }))}
+                        correctAnswer={currentQuestionScreen.answer}
+                        handleNext={handleNextQuestion}
+                        isLoading={currentQuestionScreenLoading}
+                        question={currentQuestionScreen.question}
+                        explanation={currentQuestionScreen.explanation}
+                        questionId={currentQuestionScreen.id}
+                        subject={slug}
+                        onQuestionResult={handleQuestionResult}
+                    />}
+
+                {/* Quiz Completion Card */}
+                {quizOver &&
+                    <QuizCompletionCard
+                        totalQuestions={totalQuestionsAttempted}
+                        correctAnswers={correctAnswers}
+                    />
+                }
             </div>
         </AuthMiddleware>
     )

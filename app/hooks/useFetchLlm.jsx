@@ -1,37 +1,27 @@
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { generateText } from 'ai';
 import Ajv from 'ajv';
-import { useState } from 'react';
 
 export default function useFetchLlm() {
-    const [data, setData] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
-
-    const generateMCQ = async (question) => {
+    // This function returns a promise that resolves to the MCQ data
+    const generateMCQ = (question) => {
         if (!question) {
-            return;
+            return null;
         }
 
-        setIsLoading(true);
-        setError(null);
+        const prompt = `Generate 4 multiple-choice options and the correct answer key (0-3) for the question: "${question}". Return the response as a JSON object with "options" (an array of strings) and "answer_key" (a number) and "explanation" (a small but detailed easy to understand explanation for the correct answer) keys.
+        
+        Don't use any use any ordering for the options. like "A: option1, B: option2, C: option3, D: option4" or "1: option1, 2: option2, 3: option3, 4: option4" or anything like that. Just return the options in a random order.`;
 
-        try {
-            const prompt = `Generate 4 multiple-choice options and the correct answer key (0-3) for the question: "${question}". Return the response as a JSON object with "options" (an array of strings) and "answer_key" (a number) and "explanation" (a small explanation for the correct answer) keys.
-            
-            Don't use any use any ordering for the options. like "A: option1, B: option2, C: option3, D: option4" or "1: option1, 2: option2, 3: option3, 4: option4" or anything like that. Just return the options in a random order.`;
+        const googleAI = createGoogleGenerativeAI({
+            apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY
+        });
 
-            const googleAI = createGoogleGenerativeAI({
-                apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY
-            });
-
-            const { text } = await generateText({
-                model: googleAI('gemini-2.0-flash'),
-                prompt: prompt,
-            });
-
-            // console.log('ai response:', text);
-
+        // Return the promise directly instead of using async/await
+        return generateText({
+            model: googleAI('gemini-2.0-flash'),
+            prompt: prompt,
+        }).then(({ text }) => {
             const cleanedText = text.trim().replace(/```json\n?|\n?```/g, '');
 
             let responseJSON;
@@ -53,10 +43,13 @@ export default function useFetchLlm() {
                         maxItems: 4,
                     },
                     answer_key: {
-                        type: 'integer',
+                        type: 'number',
                         minimum: 0,
                         maximum: 3,
                     },
+                    explanation: {
+                        type: 'string'
+                    }
                 },
                 required: ['options', 'answer_key'],
             };
@@ -68,14 +61,10 @@ export default function useFetchLlm() {
             if (!valid) {
                 throw new Error(`Invalid JSON schema: ${ajv.errorsText(validate.errors)}`);
             }
-            setData(responseJSON);
-        } catch (error) {
-            console.error("Error generating MCQ:", error);
-            setError(error.message || "An error occurred.");
-        } finally {
-            setIsLoading(false);
-        }
+
+            return responseJSON; // Return the data directly
+        });
     };
 
-    return { data, isLoading, error, generateMCQ };
+    return { generateMCQ };
 }
