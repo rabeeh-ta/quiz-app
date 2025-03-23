@@ -15,6 +15,9 @@ export default function Home() {
         <CompactCourseCard title="Bacteriology" imageUrl="/course-images/bacteriology.jpeg" onPractice={() => {
           router.push('/quiz/bacteriology');
         }} />
+        <CompactCourseCard title="Parasitology" imageUrl="/course-images/parasitology.png" onPractice={() => {
+          router.push('/quiz/parasitology');
+        }} />
       </div>
     </AuthMiddleware>
   );

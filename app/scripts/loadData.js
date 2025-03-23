@@ -20,18 +20,18 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // Read the JSON file
-const bacteriologyData = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '../data/bacteriology.json'), 'utf8')
+const questionsData = JSON.parse(
+    fs.readFileSync(path.join(__dirname, '../data/parasitology01.json'), 'utf8')
 );
 
 // Function to load data into Firestore
-const loadBacteriologyData = async () => {
+const loadQuestionsData = async () => {
     try {
         console.log('Starting to load bacteriology data to Firestore...');
-        const questionsCollection = collection(db, 'bacteriology');
+        const questionsCollection = collection(db, 'parasitology');
 
         // Process each item in the JSON data
-        const entries = Object.entries(bacteriologyData);
+        const entries = Object.entries(questionsData);
 
         for (const [id, question] of entries) {
             // Convert the string ID to a number without decimal
@@ -52,7 +52,7 @@ const loadBacteriologyData = async () => {
 };
 
 // Execute the function
-loadBacteriologyData();
+loadQuestionsData();
 
 // CommonJS export
-module.exports = loadBacteriologyData;
+module.exports = loadQuestionsData;

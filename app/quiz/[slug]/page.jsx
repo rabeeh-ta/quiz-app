@@ -7,7 +7,6 @@ import Spinner from '@/app/components/spinner';
 import useFetchLlm from '@/app/hooks/useFetchLlm';
 import useUpdateQuestion from '@/app/hooks/useUpdateQuestion';
 import { useUser } from '@/app/context/UserContext';
-import useFetchUserCompletions from '@/app/hooks/useFetchUserCompletions';
 import AuthMiddleware from '@/app/utils/authMiddleware';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -35,7 +34,6 @@ function QuizPage() {
     const { data: allQuestionData, isLoading: allQuestionDataLoading, error: allQuestionDataError } = useGetQuestion(slug);
     const { generateMCQ } = useFetchLlm();
     const { updateQuestion, isLoading: updateQuestionLoading, error: updateQuestionError } = useUpdateQuestion();
-    const { data: userCompletions, isLoading: userCompletionsLoading, error: userCompletionsError } = useFetchUserCompletions(user?.id, true);
 
     // Function to end the quiz
     const endQuiz = useCallback(() => {
