@@ -11,7 +11,7 @@ export default function CompactCourseCard({
 }) {
     return (
         <Card className="w-full overflow-hidden shadow-md py-0 bg-white dark:bg-gray-950 dark:border-gray-800">
-            <CardContent className="p-4 flex flex-col sm:flex-row items-center gap-4">
+            <CardContent className="p-4 flex flex-row items-center gap-4">
                 <div className="relative h-16 w-16 overflow-hidden rounded-md flex-shrink-0">
                     <Image
                         src={imageUrl}
@@ -22,13 +22,13 @@ export default function CompactCourseCard({
                     />
                 </div>
 
-                <h2 className="text-base font-medium line-clamp-2 flex-1 text-center sm:text-left">{title}</h2>
+                <h2 className="text-base font-medium line-clamp-2 flex-1">{title}</h2>
 
                 <Button
                     variant="default"
                     size="default"
                     onClick={onPractice}
-                    className="px-6 py-2 font-semibold flex-shrink-0 w-full sm:w-auto"
+                    className="px-6 py-2 font-semibold flex-shrink-0"
                 >
                     Practice
                 </Button>

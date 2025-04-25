@@ -21,31 +21,31 @@ const db = getFirestore(app);
 
 // Read the JSON file
 const questionsData = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '../data/parasitology01.json'), 'utf8')
+    fs.readFileSync(path.join(__dirname, '../data/biochemistry01.json'), 'utf8')
 );
 
 // Function to load data into Firestore
 const loadQuestionsData = async () => {
     try {
-        console.log('Starting to load bacteriology data to Firestore...');
-        const questionsCollection = collection(db, 'parasitology');
+        console.log('Starting to load biochemistry data to Firestore...');
+        const questionsCollection = collection(db, 'biochemistry');
 
         // Process each item in the JSON data
         const entries = Object.entries(questionsData);
 
-        for (const [id, question] of entries) {
+        entries.forEach(async ([id, question], index) => {
             // Convert the string ID to a number without decimal
             const numericId = parseInt(id, 10);
             // Create a document with the numeric ID
             await setDoc(doc(questionsCollection, numericId.toString()), {
-                id: numericId,
+                id: index,
                 question: question,
                 createdAt: new Date()
             });
-            console.log(`Added question ${numericId}`);
-        }
+            console.log(`Added question id ${numericId} (${index + 1}/${entries.length})`);
+        });
 
-        console.log(`Successfully loaded ${entries.length} bacteriology questions to Firestore`);
+        console.log(`Successfully loaded ${entries.length} biochemistry questions to Firestore`);
     } catch (error) {
         console.error('Error loading data to Firestore:', error);
     }
