@@ -1,3 +1,7 @@
+/*
+    This script is used to assign a user claim to a user object in firebase auth. add the USER_UID and the claims you want to assign to the user.
+*/
+
 // app/scripts/assignUserClaim.js
 const admin = require('firebase-admin');
 const serviceAccount = require('../keys/serviceAccountKey.json');
@@ -20,8 +24,15 @@ async function setUserClaims(uid, claims) {
     }
 }
 
+const USER_UID = "J2xH927JkQdOVYf2X3F4Ty1oKze2"
+
+const claims = {
+    admin: true,
+    role: ['admin', 'super_admin']
+}
+
 // Set admin claim for your user
-setUserClaims("J2xH927JkQdOVYf2X3F4Ty1oKze2", { admin: true, role: ['admin', 'super_admin'] })
+setUserClaims(USER_UID, claims)
     .then(() => {
         console.log('Done setting claims');
         process.exit(0);
