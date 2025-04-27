@@ -7,13 +7,29 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Questions collection (1-74 as shown in data.txt)
-    match /questions/{questionId} {
+    // Subject-specific collections (biochemistry, etc.)
+    match /{subject}/{questionId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.token.admin == true;
     }
 
-    // User analytics and attempts
+    // Questions collection
+    match /questions/{questionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.token.admin == true;
+    }
+
+    // User completions collection
+    match /userCompletions/{completionId} {
+      allow read: if isAuthenticated() && 
+        (request.auth.uid == resource.data.userId || request.auth.token.admin == true);
+      allow create: if isAuthenticated() && 
+        request.auth.uid == request.resource.data.userId;
+      allow update, delete: if isAuthenticated() && 
+        request.auth.uid == resource.data.userId;
+    }
+
+    // User data
     match /users/{userId} {
       allow read: if isAuthenticated() && request.auth.uid == userId;
       allow write: if isAuthenticated() && request.auth.uid == userId;
