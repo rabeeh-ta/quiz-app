@@ -45,7 +45,7 @@ export default function SubjectAnalytics({ subject }) {
                 <div className="grid grid-cols-2 gap-4">
                     <div className="p-3 rounded-lg bg-muted/50">
                         <p className="text-sm text-muted-foreground">Correctly Answered</p>
-                        <p className="text-2xl font-bold text-green-600">{answeredQuestions}</p>
+                        <p className="text-2xl font-bold text-green-600">{correctAttempts}</p>
                         <p className="text-xs text-muted-foreground">{completionRate}% completed</p>
                     </div>
                     <div className="p-3 rounded-lg bg-muted/50">
