@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import BottomNavigation from './BottomNavigation';
+import BottomNavigation from '../components/BottomNavigation';
 
 /**
  * Layout component that conditionally renders navigation

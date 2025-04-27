@@ -20,16 +20,36 @@ export function UserProvider({ children }) {
         const auth = getAuth(app);
 
         // Set up listener for authentication state changes
-        const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+        const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
             if (authUser) {
-                // User is signed in
-                // Create a clean user object with just the data we need
-                setUser({
-                    id: authUser.uid,
-                    email: authUser.email,
-                    displayName: authUser.displayName,
-                    photoURL: authUser.photoURL,
-                });
+                try {
+                    // Get the ID token result which includes custom claims
+                    const tokenResult = await authUser.getIdTokenResult();
+
+                    // User is signed in
+                    // Create a clean user object with data and claims
+                    setUser({
+                        id: authUser.uid,
+                        email: authUser.email,
+                        displayName: authUser.displayName,
+                        photoURL: authUser.photoURL,
+                        // Add custom claims
+                        isAdmin: tokenResult.claims.admin || false,
+                        role: tokenResult.claims.role || 'user',
+                        // You can add more claims here as needed
+                    });
+                } catch (error) {
+                    console.error('Error getting user claims:', error);
+                    // Set user without claims if there's an error
+                    setUser({
+                        id: authUser.uid,
+                        email: authUser.email,
+                        displayName: authUser.displayName,
+                        photoURL: authUser.photoURL,
+                        isAdmin: false,
+                        role: 'user'
+                    });
+                }
             } else {
                 // User is signed out
                 setUser(null);
@@ -43,6 +63,8 @@ export function UserProvider({ children }) {
 
     const value = {
         user,
+        roles: user?.role || [],
+        isAdmin: user?.isAdmin || false,
         loading,
         isAuthenticated: !!user,
     };

@@ -5,15 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Firebase configuration - copy from your firebase.jsx
-const firebaseConfig = {
-    apiKey: "AIzaSyAbduLHHHloI3AuVl3nEG3NpUFUkFrHiFA",
-    authDomain: "quiz-app-f505f.firebaseapp.com",
-    projectId: "quiz-app-f505f",
-    storageBucket: "quiz-app-f505f.firebasestorage.app",
-    messagingSenderId: "968723393621",
-    appId: "1:968723393621:web:eb33812c0921065c86b8dc",
-    measurementId: "G-S1G7M4JKSJ"
-};
+import firebaseConfig from './firebaseCridentials';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -21,7 +13,7 @@ const db = getFirestore(app);
 
 // Read the JSON file
 const questionsData = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '../data/biochemistry01.json'), 'utf8')
+    fs.readFileSync(path.join(__dirname, '../dataset/biochemistry01.json'), 'utf8')
 );
 
 // Function to load data into Firestore
