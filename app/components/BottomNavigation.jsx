@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Book, User } from 'lucide-react';
+import { Home, Book, BarChart, User } from 'lucide-react';
 
 export default function BottomNavigation() {
     const pathname = usePathname();
@@ -23,6 +23,14 @@ export default function BottomNavigation() {
             >
                 <Book size={24} className={pathname === '/subject' ? 'text-primary' : 'text-muted-foreground'} />
                 <span className="text-xs mt-1">Subjects</span>
+            </Link>
+
+            <Link
+                href="/analytics"
+                className={`flex flex-1 flex-col items-center justify-center ${pathname === '/analytics' ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+                <BarChart size={24} className={pathname === '/analytics' ? 'text-primary' : 'text-muted-foreground'} />
+                <span className="text-xs mt-1">Analytics</span>
             </Link>
 
             <Link

@@ -1,0 +1,77 @@
+-- userModel
+firebase google signin
+user {
+    id: uuid
+}
+
+-- Subject models
+bacteriology {
+    answer: String
+    createdAt: TimeStamp
+    explanation: String
+    id
+    updatedAt: TimeSTamp
+    question: String
+    options [String]
+}
+
+biochemistry {
+    answer: String
+    createdAt: TimeStamp
+    explanation: String
+    id
+    updatedAt: TimeSTamp
+    question: String
+    options [String]
+}
+
+
+blood-banking {
+    answer: String
+    createdAt: TimeStamp
+    explanation: String
+    id
+    updatedAt: TimeSTamp
+    question: String
+    options [String]
+}
+
+hematology {
+    answer: String
+    createdAt: TimeStamp
+    explanation: String
+    id
+    updatedAt: TimeSTamp
+    question: String
+    options [String]
+}
+
+immunology {
+    answer: String
+    createdAt: TimeStamp
+    explanation: String
+    id
+    updatedAt: TimeSTamp
+    question: String
+    options [String]
+}
+
+parasitology {
+    answer: String
+    createdAt: TimeStamp
+    explanation: String
+    id
+    updatedAt: TimeSTamp
+    question: String
+    options [String]
+}
+
+
+-- Data collection models
+userCompletions {
+    answered: Boolean
+    attempted_on: TimeStamp
+    questionId: Foreign key, id Subject models
+    subject: collection name Subject models
+    userId: firebase user uuid
+}
