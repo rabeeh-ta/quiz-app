@@ -18,7 +18,7 @@ export default function useUserWeeklyStreak() {
         }
 
         async function fetchWeeklyStreak() {
-            console.log('Starting to fetch weekly streak for user:', user.id);
+            setLoading(true);
             try {
                 // Get the start and end of the current week (Sunday to Saturday)
                 const now = new Date();
@@ -29,11 +29,6 @@ export default function useUserWeeklyStreak() {
                 endOfWeek.setDate(startOfWeek.getDate() + 6);
                 endOfWeek.setHours(23, 59, 59, 999);
 
-                console.log('Querying for date range:', {
-                    start: startOfWeek.toISOString(),
-                    end: endOfWeek.toISOString()
-                });
-
                 // Query userCompletions for this user and this week
                 const q = query(
                     collection(db, 'userCompletions'),
@@ -42,13 +37,11 @@ export default function useUserWeeklyStreak() {
                     where('attempted_on', '<=', endOfWeek)
                 );
                 const snapshot = await getDocs(q);
-                console.log('Documents found:', snapshot.size);
 
                 // Track which days have completions
                 const daysWithCompletion = [false, false, false, false, false, false, false];
                 snapshot.forEach(doc => {
                     const docData = doc.data();
-                    console.log('Processing document:', doc.id, docData);
                     const { attempted_on } = docData;
                     if (attempted_on) {
                         const date = attempted_on.toDate();
@@ -57,7 +50,6 @@ export default function useUserWeeklyStreak() {
                     }
                 });
 
-                console.log('Days with completion:', daysWithCompletion);
                 setWeekDays(daysWithCompletion);
 
                 let streakCount = 0;
@@ -68,10 +60,11 @@ export default function useUserWeeklyStreak() {
                         streakCount = 0;
                     }
                 }
-                console.log('Final streak count:', streakCount);
+                setLoading(false);
                 setStreak(streakCount);
             } catch (error) {
                 console.error('Error fetching weekly streak:', error);
+                setLoading(false);
             }
         }
 

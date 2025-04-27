@@ -3,16 +3,15 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import Image from "next/image"
+import { useRouter } from "next/navigation";
 
 export default function CourseCard({
     imageUrl = "",
     title = "",
     description = "",
-    primaryActionText = "",
-    secondaryActionText = "",
-    onPrimaryAction = () => { },
-    onSecondaryAction = () => { },
+    slug = "",
 }) {
+    const router = useRouter();
     return (
         <Card className="w-full max-w-md overflow-hidden shadow-md gap-2 bg-white dark:bg-gray-950 dark:border-gray-800">
             <div className="relative h-44 w-full overflow-hidden">
@@ -33,12 +32,21 @@ export default function CourseCard({
                 <p className="text-sm text-muted-foreground line-clamp-3">{description}</p>
             </CardContent>
 
-            <CardFooter className="flex gap-2 p-4 pt-0">
-                <Button variant="outline" className="flex-1 dark:border-gray-700 dark:hover:bg-gray-800" onClick={onSecondaryAction}>
-                    {secondaryActionText}
+            <CardFooter className="flex gap-2 p-4 pt-0 flex-wrap">
+                <Button variant="outline" className="flex-1 dark:border-gray-700 dark:hover:bg-gray-800" onClick={() => {
+                    router.push(`/quiz/${slug}`);
+                }}>
+                    Practice Quiz
                 </Button>
-                <Button variant="default" className="flex-1" onClick={onPrimaryAction}>
-                    {primaryActionText}
+                <Button variant="outline" className="flex-1 dark:border-gray-700 dark:hover:bg-gray-800" onClick={() => {
+                    router.push(`/analytics/#${slug}`);
+                }}>
+                    View Analytics
+                </Button>
+                <Button variant="default" className="flex-1" onClick={() => {
+                    router.push(`/subject/${slug}`);
+                }}>
+                    See Questions
                 </Button>
             </CardFooter>
         </Card>
